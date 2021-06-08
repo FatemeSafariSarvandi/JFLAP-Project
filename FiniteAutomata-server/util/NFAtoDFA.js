@@ -1,14 +1,31 @@
 //convert nfa to dfa
 module.exports = (automata) => {
-
     let noLamda = 0;
     for (let i = 0; i < automata.transitionTable.length; i++) {
-        if (automata.transitionTable[i].end[2] === "") {
-            noLamda++
+        if (
+            automata.transitionTable[i].end[automata.alphabet.length - 1] === ''
+        ) {
+            noLamda++;
         }
     }
     if (noLamda === automata.transitionTable.length) {
         return automata;
+    }
+
+    for (let i = 0; i < automata.transitionTable.length; i++) {
+        if (
+            automata.alphabet.length !== automata.transitionTable[i].end.length
+        ) {
+            set(i);
+            i--;
+        }
+    }
+    for (let i = 0; i < automata.transitionTable.length; i++) {
+        for (let j = 0; j < automata.alphabet.length; j++) {
+            if (automata.transitionTable[i].end[j] === null) {
+                automata.transitionTable[i].end[j] = '';
+            }
+        }
     }
 
     let transitionTable1;
@@ -25,17 +42,23 @@ module.exports = (automata) => {
     //complete the stateName of first row of newAutomata.transitionTable
     let newAutomata = {
         alphabet: automata.alphabet,
-        transitionTable: [{
-            stateName: automata.transitionTable[0].stateName,
-            transition: automata.transitionTable[0].transition,
-            end: [],
-        }],
+        transitionTable: [
+            {
+                stateName: automata.transitionTable[0].stateName,
+                transition: automata.transitionTable[0].transition,
+                end: [],
+            },
+        ],
         startState: automata.startState,
-        finalStates: [] //!
+        finalStates: [], //!
     };
 
     //complete the end of first row of newAutomata.transitionTable
-    for (let tr = 0; tr < automata.transitionTable[0].transition.length - 1; tr++) {
+    for (
+        let tr = 0;
+        tr < automata.transitionTable[0].transition.length - 1;
+        tr++
+    ) {
         let TransitionStatus;
         try {
             TransitionStatus = automata.transitionTable[0].end[tr].split('');
@@ -48,9 +71,13 @@ module.exports = (automata) => {
             lambdaTrasition = newAutomata.transitionTable[0].end[tr];
         }
         for (let x = 0; x < TransitionStatus.length; x++) {
-            let TransitionStatus = automata.transitionTable[0].end[tr].split('');
+            let TransitionStatus =
+                automata.transitionTable[0].end[tr].split('');
             //find the stateName in automata.transitionTable that equal to TransitionStatus(split of automata.transitionTable of end)
-            let index = findStateName(automata.transitionTable, TransitionStatus[x]);
+            let index = findStateName(
+                automata.transitionTable,
+                TransitionStatus[x]
+            );
 
             //read the last index of automata.transitionTable.end (*) for add that to newAutomata.transitionTable.end
             if (
@@ -59,12 +86,12 @@ module.exports = (automata) => {
                     automata.transitionTable[index].end[indexOfLambda]
                 ) === -1
             )
-                lambdaTrasition += automata.transitionTable[index].end[indexOfLambda];
+                lambdaTrasition +=
+                    automata.transitionTable[index].end[indexOfLambda];
         }
 
         lambdaTrasition = lambdaTrasition.split('').sort().join('');
         newAutomata.transitionTable[0].end[tr] = lambdaTrasition;
-
     }
 
     //complete the another row of newAutomata.transitionTable
@@ -91,9 +118,8 @@ module.exports = (automata) => {
         //complete the end of newAutomata.transitionTable
         let splitStateName_newTransitionTable;
         try {
-            splitStateName_newTransitionTable = newAutomata.transitionTable[
-                i + 1
-            ].stateName.split('');
+            splitStateName_newTransitionTable =
+                newAutomata.transitionTable[i + 1].stateName.split('');
         } catch (err) {
             break;
         }
@@ -105,16 +131,25 @@ module.exports = (automata) => {
                 splitStateName_newTransitionTable[n]
             );
 
-            for (let tr = 0; tr < automata.transitionTable[0].transition.length - 1; tr++) {
-                let TransitionStatus = automata.transitionTable[num].end[tr].split('');
+            for (
+                let tr = 0;
+                tr < automata.transitionTable[0].transition.length - 1;
+                tr++
+            ) {
+                let TransitionStatus =
+                    automata.transitionTable[num].end[tr].split('');
 
                 let lambdaTrasition = '';
                 if (newAutomata.transitionTable[i + 1].end[tr] !== undefined) {
-                    lambdaTrasition = newAutomata.transitionTable[i + 1].end[tr];
+                    lambdaTrasition =
+                        newAutomata.transitionTable[i + 1].end[tr];
                 }
                 for (let x = 0; x < TransitionStatus.length; x++) {
                     //find the stateName in automata.transitionTable that equal to TransitionStatus(split of automata.transitionTable of end)
-                    let index = findStateName(automata.transitionTable, TransitionStatus[x]);
+                    let index = findStateName(
+                        automata.transitionTable,
+                        TransitionStatus[x]
+                    );
 
                     //read the last index of automata.transitionTable.end (*) for add that to newAutomata.transitionTable.end
                     if (
@@ -138,8 +173,10 @@ module.exports = (automata) => {
     let setposition = [];
     for (let o = 0; o < automata.transitionTable.length; o++) {
         for (let w = 0; w < automata.finalStates.length; w++) {
-
-            if (automata.transitionTable[o].stateName === automata.finalStates[w]) {
+            if (
+                automata.transitionTable[o].stateName ===
+                automata.finalStates[w]
+            ) {
                 setposition.push(automata.transitionTable[o].stateName);
             }
         }
@@ -148,9 +185,15 @@ module.exports = (automata) => {
     for (let p = 0; p < newAutomata.transitionTable.length; p++) {
         for (let a = 0; a < setposition.length; a++) {
             if (
-                findAlfabet(newAutomata.transitionTable[p].stateName, setposition[a]) !== -1
+                findAlfabet(
+                    newAutomata.transitionTable[p].stateName,
+                    setposition[a]
+                ) !== -1
             ) {
-                newAutomata.finalStates = [...newAutomata.finalStates, newAutomata.transitionTable[p].stateName];
+                newAutomata.finalStates = [
+                    ...newAutomata.finalStates,
+                    newAutomata.transitionTable[p].stateName,
+                ];
             }
         }
     }
@@ -172,9 +215,11 @@ module.exports = (automata) => {
         }
         return -1;
     }
+    function set(i) {
+        automata.transitionTable[i].end.push('');
+    }
     console.log(automata);
     console.log(newAutomata);
 
     return newAutomata;
-
-}
+};

@@ -27,11 +27,13 @@ module.exports = (automata) => {
     let boolean = [];
     let temp = [];
     let k = 0;
-    let newTransitionTable = [{
-        stateName: '',
-        transition: automata.alphabet,
-        end: [],
-    }, ];
+    let newTransitionTable = [
+        {
+            stateName: '',
+            transition: automata.alphabet,
+            end: [],
+        },
+    ];
     //Seprate Finall and onFinalState
     function FindnonfinalState() {
         automata.transitionTable.forEach((element) => {
@@ -96,7 +98,9 @@ module.exports = (automata) => {
         //Based Final OR onFinal
         for (row = 0; row < array.length; row++) {
             for (
-                column = States[row].end.length + 1; column < States[row].end.length + 2; column++
+                column = States[row].end.length + 1;
+                column < States[row].end.length + 2;
+                column++
             ) {
                 if (!nonfinalStateName.includes(array[row][0])) {
                     array[row][column] = 1;
@@ -156,7 +160,10 @@ module.exports = (automata) => {
         for (let m = 0; m < array.length; m++) {
             for (let k = m + 1; k < array.length; k++) {
                 found = false;
-                if (array[m][column - Endlength] === array[k][column - Endlength]) {
+                if (
+                    array[m][column - Endlength] ===
+                    array[k][column - Endlength]
+                ) {
                     found = true;
                     for (let w = Endlength - 1; w > 0; w--) {
                         if (array[m][column - w] !== array[k][column - w]) {
@@ -248,11 +255,13 @@ module.exports = (automata) => {
                         end: [],
                     });
                     for (let j = 1; j < automata.alphabet.length; j++) {
-                        newTransitionTable[newTransitionTable.length - 1].end.push(
-                            array[i][j]
-                        );
+                        newTransitionTable[
+                            newTransitionTable.length - 1
+                        ].end.push(array[i][j]);
                     }
-                    newTransitionTable[newTransitionTable.length - 1].end.push('');
+                    newTransitionTable[newTransitionTable.length - 1].end.push(
+                        ''
+                    );
                 }
             }
         }
@@ -277,10 +286,29 @@ module.exports = (automata) => {
         }
         return -1;
     }
+    function set(i) {
+        automata.transitionTable[i].end.push('');
+    }
     //-------------------------------------------
     // main function
     function MinimizeDFA() {
         //move start state to first row of transitionTable
+        for (let i = 0; i < automata.transitionTable.length; i++) {
+            if (
+                automata.alphabet.length !==
+                automata.transitionTable[i].end.length
+            ) {
+                set(i);
+                i--;
+            }
+        }
+        for (let i = 0; i < automata.transitionTable.length; i++) {
+            for (let j = 0; j < automata.alphabet.length; j++) {
+                if (automata.transitionTable[i].end[j] === null) {
+                    automata.transitionTable[i].end[j] = '';
+                }
+            }
+        }
 
         let transitionTable1;
         for (let r = 0; r < automata.transitionTable.length; r++) {
@@ -309,4 +337,4 @@ module.exports = (automata) => {
     console.table(array);
 
     return automata;
-}
+};
